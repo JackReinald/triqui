@@ -15,7 +15,7 @@ const WINNER_COMBO = [
   [0, 1, 2], // Horizontales
   [3, 4, 5],
   [6, 7, 8],
-  [0, 3, 5], // Verticales
+  [0, 3, 6], // Verticales
   [1, 4, 7],
   [2, 5, 8],
   [0, 4, 8], // Diagonales
@@ -34,18 +34,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   const [turno, setTurno] = useState<string>(TURNOS.X);
 
-  const [winner, setWinner] = useState<string | boolean | null>(null);
+  const [winner, setWinner] = useState<string | null>(null);
 
   const [isDraw, setIsDraw] = useState<boolean>(false);
 
   const handleClick = (index: number) => {
     // Si la celda ya tiene contenido o si el juego ya fue ganado/empatado, salir de la función
-    if (tablero[index] !== null || winner !== null || isDraw) {
-      console.log(
-        "entró en condicional que verifica casillas nulas y existencia de ganador"
-      );
-      return;
-    }
+    if (tablero[index] !== null || winner !== null || isDraw) return;
 
     const copiaTablero = [...tablero];
     copiaTablero[index] = turno; // Asigna turno al tablero
@@ -53,11 +48,18 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
     // Verificar si hay ganador
     const newWinner = checkWinner(copiaTablero);
+    console.log("Tablero después del último movimiento:", copiaTablero);
+    console.log("Resultado de checkWinner (newWinner):", newWinner);
+    const isTableroFull = checkEndGame(copiaTablero);
+
     if (newWinner) {
       setWinner(newWinner);
-    } else if (checkEndGame(copiaTablero)) {
+      console.log("¡Ganador detectado!");
+    } else if (isTableroFull) {
       setIsDraw(true);
+      console.log("¡Empate detectado!");
     } else {
+      console.log("El juego continúa, cambiando turno.");
       const nuevoTurno = turno == TURNOS.O ? TURNOS.X : TURNOS.O;
       setTurno(nuevoTurno); // Actualiza el turno
     }
@@ -103,24 +105,26 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             value={celda}
             onClick={() => handleClick(index)}
             className="w-full h-full border-2 border-indigo-600 text-5xl cursor-pointer hover:bg-emerald-300"
+            xColor="text-x-color"
+            oColor="text-o-color"
           ></Square>
         ))}
       </div>
       {/* Ventana modal/mensaje de fin de juego */}
-      {winner !== null && (
+      {(winner !== null || isDraw) && (
         <section>
           <h2 className="text-5xl">
-            {winner === false ? (
+            {isDraw ? (
               "Empate"
             ) : (
               <>
                 Ganó {""}
                 <span
                   className={
-                    winner === TURNOS.X ? "text-red-500" : "text-blue-500"
+                    winner === TURNOS.X ? "text-x-color" : "text-o-color"
                   }
                 >
-                  {winner.toString().toUpperCase()}
+                  {winner?.toUpperCase()}
                 </span>
               </>
             )}

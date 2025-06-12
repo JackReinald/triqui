@@ -1,2 +1,6 @@
 @import "tailwindcss";
 
+@theme {
+    --color-x-color: rgb(223, 19, 72 );
+    --color-o-color: rgb(19, 44, 223);
+}
