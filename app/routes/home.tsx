@@ -1,8 +1,12 @@
 import { useState } from "react";
 import type { Route } from "./+types/home";
-import Square from "~/components/square";
+import Square from "../components/Square";
 
-const TURNOS = {
+type turnos = {
+  X: string;
+  O: string;
+};
+const TURNOS: turnos = {
   X: "x",
   O: "o",
 };
@@ -31,7 +35,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   );
 
   // Estado del turno actual
-  const [turno, setTurno] = useState(TURNOS.X);
+  const [turno, setTurno] = useState<string>(TURNOS.X);
 
   // Estado del ganador
   const [winner, setWinner] = useState<string | boolean | null>(null);
@@ -91,27 +95,48 @@ export default function Home({ loaderData }: Route.ComponentProps) {
   };
 
   return (
-    <div className="text-center p-4">
-      <h1>Bienvenido al juego triqui</h1>
-      <section className="turn-indicator">Turno de: {turno}</section>{" "}
+    <div className="flex flex-col items-center justify-center text-center p-4">
+      <h1 className="text-3xl font-bold my-4">Bienvenido al juego triqui</h1>
       {/* Mostrar el turno actual */}
+      <section className="mb-2 font-stretch-75% text-2xl ">
+        Turno de: {turno.toUpperCase()}
+      </section>
       {/*Contenedor de las celdas de ajedrez */}
-      <div className="game">
+      <div className="grid grid-cols-3 grid-rows-3 border-5 size-50 my-24 mx-30">
         {tablero.map((celda, index) => (
           <Square
             key={index}
             value={celda}
             onClick={() => handleClick(index)}
+            className="w-full h-full border-2 border-indigo-600 text-5xl cursor-pointer hover:bg-emerald-300"
           ></Square>
         ))}
       </div>
       {/* Ventana modal/mensaje de fin de juego */}
       {winner !== null && (
         <section>
-          <h2>{winner === false ? "Empate" : "Ganó " + winner}</h2>
-          <div className="footer-reset">
-            <button onClick={resetGame}>Empezar nuevamente</button>
-          </div>
+          <h2 className="text-5xl">
+            {winner === false ? (
+              "Empate"
+            ) : (
+              <>
+                Ganó {""}
+                <span
+                  className={
+                    winner === TURNOS.X ? "text-red-500" : "text-blue-500"
+                  }
+                >
+                  {winner.toString().toUpperCase()}
+                </span>
+              </>
+            )}
+          </h2>
+          <button
+            className="mt-6 text-xl border-4 border-solid border-amber-600 hover:bg-amber-300 rounded-lg"
+            onClick={resetGame}
+          >
+            Empezar nuevamente
+          </button>
         </section>
       )}
     </div>
