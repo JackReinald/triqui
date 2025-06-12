@@ -27,30 +27,26 @@ export function loader() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  // Aquí va código Javascript
-
   // Estado del tablero, tiene 9 cuadrículas, el estado de cada una es: ["x", "o", null]
   const [tablero, setTablero] = useState<Array<string | null>>(
     Array(9).fill(null)
   );
 
-  // Estado del turno actual
   const [turno, setTurno] = useState<string>(TURNOS.X);
 
-  // Estado del ganador
   const [winner, setWinner] = useState<string | boolean | null>(null);
 
-  // Función para manejar los clics de las celdas
+  const [isDraw, setIsDraw] = useState<boolean>(false);
+
   const handleClick = (index: number) => {
-    // Si la celda ya tiene contenido o si el juego ya fue ganado, salir de la función
-    if (tablero[index] !== null || winner !== null) {
+    // Si la celda ya tiene contenido o si el juego ya fue ganado/empatado, salir de la función
+    if (tablero[index] !== null || winner !== null || isDraw) {
       console.log(
         "entró en condicional que verifica casillas nulas y existencia de ganador"
       );
       return;
     }
 
-    // Crear copia del tablero por seguridad
     const copiaTablero = [...tablero];
     copiaTablero[index] = turno; // Asigna turno al tablero
     setTablero(copiaTablero);
@@ -60,14 +56,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     if (newWinner) {
       setWinner(newWinner);
     } else if (checkEndGame(copiaTablero)) {
-      setWinner(false); // Establece el ganador como false para indicar un empate
+      setIsDraw(true);
     } else {
       const nuevoTurno = turno == TURNOS.O ? TURNOS.X : TURNOS.O;
       setTurno(nuevoTurno); // Actualiza el turno
     }
   };
 
-  // Función para revisar si hay ganador
   const checkWinner = (tablero: any[]) => {
     for (const combo of WINNER_COMBO) {
       const [pos1, pos2, pos3] = combo;
@@ -76,22 +71,21 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         tablero[pos1] === tablero[pos2] &&
         tablero[pos2] === tablero[pos3]
       ) {
-        return tablero[pos1]; // Retorna el símbolo ganador ubicado en la primera posición
+        return tablero[pos1];
       }
     }
     return null;
   };
 
-  // Función para verificar el fin del juego
   const checkEndGame = (tablero: Array<string | null>) => {
     return tablero.every((cuadricula) => cuadricula !== null);
   };
 
-  // Función para reiniciar el juego
   const resetGame = () => {
     setTablero(Array(9).fill(null));
     setTurno(TURNOS.X);
     setWinner(null);
+    setIsDraw(false);
   };
 
   return (
@@ -101,7 +95,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <section className="mb-2 font-stretch-75% text-2xl ">
         Turno de: {turno.toUpperCase()}
       </section>
-      {/*Contenedor de las celdas de ajedrez */}
+
       <div className="grid grid-cols-3 grid-rows-3 border-5 size-50 my-24 mx-30">
         {tablero.map((celda, index) => (
           <Square
