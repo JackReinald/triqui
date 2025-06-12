@@ -48,18 +48,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
     // Verificar si hay ganador
     const newWinner = checkWinner(copiaTablero);
-    console.log("Tablero después del último movimiento:", copiaTablero);
-    console.log("Resultado de checkWinner (newWinner):", newWinner);
     const isTableroFull = checkEndGame(copiaTablero);
 
     if (newWinner) {
       setWinner(newWinner);
-      console.log("¡Ganador detectado!");
     } else if (isTableroFull) {
       setIsDraw(true);
-      console.log("¡Empate detectado!");
     } else {
-      console.log("El juego continúa, cambiando turno.");
       const nuevoTurno = turno == TURNOS.O ? TURNOS.X : TURNOS.O;
       setTurno(nuevoTurno); // Actualiza el turno
     }
